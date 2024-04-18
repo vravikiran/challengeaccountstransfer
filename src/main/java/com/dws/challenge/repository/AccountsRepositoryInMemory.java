@@ -1,12 +1,13 @@
 package com.dws.challenge.repository;
 
-import com.dws.challenge.domain.Account;
-import com.dws.challenge.exception.DuplicateAccountIdException;
-import org.springframework.stereotype.Repository;
-
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Repository;
+
+import com.dws.challenge.domain.Account;
+import com.dws.challenge.exception.DuplicateAccountIdException;
 
 @Repository
 public class AccountsRepositoryInMemory implements AccountsRepository {

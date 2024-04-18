@@ -1,5 +1,6 @@
 package com.dws.challenge.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1/accounts")
 @Slf4j
 public class AccountsController {
-
+	
+	@Autowired
 	private final AccountsService accountsService;
 
 	public AccountsController(AccountsService accountsService) {

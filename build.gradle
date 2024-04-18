@@ -21,6 +21,7 @@ dependencies {
     api libs.org.springframework.boot.spring.boot.starter.web
     api libs.org.projectlombok.lombok
     api libs.org.springframework.data.spring.data.jpa
+    api libs.jakarta.persistence.jakarta.persistence.api
     testImplementation libs.org.springframework.boot.spring.boot.starter.test
 }
 

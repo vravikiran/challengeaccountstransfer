@@ -2,6 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
+jakarta-persistence-jakarta-persistence-api = "3.1.0"
 org-projectlombok-lombok = "1.18.30"
 org-springframework-boot-spring-boot-starter-test = "3.1.10"
 org-springframework-boot-spring-boot-starter-validation = "3.1.10"
@@ -9,6 +10,7 @@ org-springframework-boot-spring-boot-starter-web = "3.1.10"
 org-springframework-data-spring-data-jpa = "3.1.10"
 
 [libraries]
+jakarta-persistence-jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakarta-persistence-jakarta-persistence-api" }
 org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = "org-projectlombok-lombok" }
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot-spring-boot-starter-test" }
 org-springframework-boot-spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "org-springframework-boot-spring-boot-starter-validation" }

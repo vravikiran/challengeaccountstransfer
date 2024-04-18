@@ -3,7 +3,9 @@ package com.dws.challenge.service;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dws.challenge.domain.Account;
@@ -12,15 +14,16 @@ import com.dws.challenge.exception.AccountDoesNotExistsException;
 import com.dws.challenge.exception.InsufficientBalanceException;
 import com.dws.challenge.repository.AccountsRepository;
 
+import jakarta.persistence.LockModeType;
+
 @Service
-@Transactional
 public class AccountsService {
 
 	@Autowired
 	private final AccountsRepository accountsRepository;
 
 	@Autowired
-	private NotificationService notificationService;
+	private final NotificationService notificationService;
 
 	public AccountsRepository getAccountsRepository() {
 		return accountsRepository;
@@ -35,10 +38,7 @@ public class AccountsService {
 		return notificationService;
 	}
 
-	public void setNotificationService(NotificationService notificationService) {
-		this.notificationService = notificationService;
-	}
-
+	@Transactional
 	public void createAccount(Account account) {
 		this.accountsRepository.createAccount(account);
 	}
@@ -48,6 +48,8 @@ public class AccountsService {
 		return account;
 	}
 
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	public Account updateBalance(Account account) throws AccountDoesNotExistsException {
 		Account origAcc = accountsRepository.getAccount(account.getAccountId());
 		if (origAcc != null) {
@@ -58,12 +60,14 @@ public class AccountsService {
 		}
 	}
 
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	public void transfetAmount(Transfer transfer) throws AccountDoesNotExistsException, InsufficientBalanceException {
 		if (accountsRepository.getAccount(transfer.getToAccount()) == null) {
 			throw new AccountDoesNotExistsException();
 		}
 		BigDecimal balance = accountsRepository.getBalance(transfer.getFromAccount());
-		if (balance.subtract(transfer.getAmount()).doubleValue() > 0) {
+		if (balance.subtract(transfer.getAmount()).doubleValue() >= 0) {
 			accountsRepository.updateBalance(transfer.getToAccount(), transfer.getAmount());
 			accountsRepository.updateBalance(transfer.getFromAccount(), balance.subtract(transfer.getAmount()));
 			this.notificationService.notifyAboutTransfer(getAccount(transfer.getFromAccount()),
