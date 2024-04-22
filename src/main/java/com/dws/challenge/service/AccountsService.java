@@ -79,6 +79,7 @@ public class AccountsService {
 		}
 	}
 
+	@Transactional
 	public void transfetAmount(Transfer transfer) throws AccountDoesNotExistsException, InsufficientBalanceException {
 		if (accountsRepository.getAccount(transfer.getToAccount()) == null) {
 			throw new AccountDoesNotExistsException();
