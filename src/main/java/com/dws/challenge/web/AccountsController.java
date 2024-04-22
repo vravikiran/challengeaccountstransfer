@@ -66,13 +66,13 @@ public class AccountsController {
 		} catch (InsufficientBalanceException insufficientBalanceException) {
 			throw new InsufficientBalanceException();
 		}
-		return new ResponseEntity<>(transfer.getAmount() + " transfered successfully to " + transfer.getToAccount(), HttpStatus.OK);
+		return new  ResponseEntity<>(transfer.getAmount() + " transfered successfully to " + transfer.getToAccount(), HttpStatus.OK);
 	}
 	
 	@PutMapping(path="/updateBalance", consumes= MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Object> updateBalance(@RequestBody Account account) throws AccountDoesNotExistsException {
-		accountsService.updateBalance(account);
+		accountsService.deposit(account,account.getBalance());
 		return new ResponseEntity<>("Balance updated successfully",HttpStatus.OK);
 	}
 
