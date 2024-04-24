@@ -90,25 +90,18 @@ public class AccountsService {
 		while (!success) {
 			BigDecimal balance = accountsRepository.getBalance(transfer.getFromAccount());
 			if (balance.subtract(transfer.getAmount()).doubleValue() >= 0) {
-				try {
-					if (reentrantLock.tryLock()) {
-
-						if (withdraw(getAccount(transfer.getFromAccount()), transfer.getAmount())) {
-							if (deposit(getAccount(transfer.getToAccount()), transfer.getAmount())) {
-								success = true;
-							}
-						} else {
-							throw new InsufficientBalanceException();
-						}
+				if (withdraw(getAccount(transfer.getFromAccount()), transfer.getAmount())) {
+					if (deposit(getAccount(transfer.getToAccount()), transfer.getAmount())) {
+						success = true;
 					}
-				} finally {
-					reentrantLock.unlock();
+				} else {
+					throw new InsufficientBalanceException();
 				}
 			}
-			this.notificationService.notifyAboutTransfer(getAccount(transfer.getFromAccount()),
-					transfer.getAmount() + " amount transferred successfully to " + transfer.getToAccount());
-			this.notificationService.notifyAboutTransfer(getAccount(transfer.getToAccount()),
-					transfer.getAmount() + " received from" + transfer.getFromAccount());
 		}
+		this.notificationService.notifyAboutTransfer(getAccount(transfer.getFromAccount()),
+				transfer.getAmount() + " amount transferred successfully to " + transfer.getToAccount());
+		this.notificationService.notifyAboutTransfer(getAccount(transfer.getToAccount()),
+				transfer.getAmount() + " received from" + transfer.getFromAccount());
 	}
 }
