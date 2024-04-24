@@ -76,7 +76,7 @@ class AccountsServiceTest {
 	void testUpdateBalance_WithValidAccount() throws InterruptedException, ExecutionException {
 		Account account = getAccount();
 		given(accountsRepository.getAccount(any())).willReturn(getAccount());
-		given(accountsRepository.updateBalance(anyString(), any())).willReturn(account);
+		given(accountsRepository.updateBalance(any())).willReturn(account);
 		assertTrue(accountsService.deposit(getAccount(), getAccount().getBalance()));
 	}
 
@@ -101,7 +101,7 @@ class AccountsServiceTest {
 		given(accountsRepository.getAccount(anyString())).willReturn(getAccount());
 		given(accountsRepository.getBalance(anyString())).willReturn(new BigDecimal(1000));
 		accountsService.transfetAmount(transfer);
-		verify(accountsRepository, times(2)).updateBalance(anyString(), any());
+		verify(accountsRepository, times(2)).updateBalance(any());
 		verify(notificationService, times(2)).notifyAboutTransfer(any(), any());
 	}
 

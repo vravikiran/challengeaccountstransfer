@@ -72,7 +72,8 @@ public class AccountsController {
 	@PutMapping(path="/updateBalance", consumes= MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Object> updateBalance(@RequestBody Account account) throws AccountDoesNotExistsException {
-		accountsService.deposit(account,account.getBalance());
+		Account origAccount = getAccount(account.getAccountId());
+		accountsService.deposit(origAccount,account.getBalance());
 		return new ResponseEntity<>("Balance updated successfully",HttpStatus.OK);
 	}
 

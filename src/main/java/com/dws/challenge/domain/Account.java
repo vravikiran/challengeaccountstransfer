@@ -2,8 +2,10 @@ package com.dws.challenge.domain;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Min;
@@ -21,6 +23,9 @@ public class Account {
 	@NotNull
 	@Min(value = 0, message = "Initial balance must be positive.")
 	private BigDecimal balance;
+	
+	@JsonIgnore
+	public final ReentrantLock lock = new ReentrantLock(true);
 
 	public Account(String accountId) {
 		this.accountId = accountId;

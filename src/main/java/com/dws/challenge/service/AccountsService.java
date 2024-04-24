@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,12 +51,12 @@ public class AccountsService {
 	}
 
 	public boolean withdraw(Account account, BigDecimal amount) {
-		if (reentrantLock.tryLock()) {
+		if (account.lock.tryLock()) {
 			try {
-				BigDecimal bal = account.getBalance();
-				accountsRepository.updateBalance(account.getAccountId(), bal.subtract(amount));
+				account.setBalance(account.getBalance().subtract(amount));
+				accountsRepository.updateBalance(account);
 			} finally {
-				reentrantLock.unlock();
+				account.lock.unlock();
 			}
 			return true;
 		} else {
@@ -64,14 +65,14 @@ public class AccountsService {
 	}
 
 	public boolean deposit(Account account, BigDecimal amount) {
-		if(getAccount(account.getAccountId())== null)
-			throw  new AccountDoesNotExistsException();
-		if (reentrantLock.tryLock()) {
+		if (getAccount(account.getAccountId()) == null)
+			throw new AccountDoesNotExistsException();
+		if (account.lock.tryLock()) {
 			try {
-				BigDecimal bal = account.getBalance();
-				accountsRepository.updateBalance(account.getAccountId(), bal.add(amount));
+				account.setBalance(account.getBalance().add(amount));
+				accountsRepository.updateBalance(account);
 			} finally {
-				reentrantLock.unlock();
+				account.lock.unlock();
 			}
 			return true;
 		} else {
@@ -80,30 +81,30 @@ public class AccountsService {
 	}
 
 	@Transactional
+	@Async
 	public void transfetAmount(Transfer transfer) throws AccountDoesNotExistsException, InsufficientBalanceException {
 		if (accountsRepository.getAccount(transfer.getToAccount()) == null) {
 			throw new AccountDoesNotExistsException();
 		}
 		boolean success = false;
 		while (!success) {
-			if (reentrantLock.tryLock()) {
+			BigDecimal balance = accountsRepository.getBalance(transfer.getFromAccount());
+			if (balance.subtract(transfer.getAmount()).doubleValue() >= 0) {
 				try {
-					BigDecimal balance = accountsRepository.getBalance(transfer.getFromAccount());
-					if (balance.subtract(transfer.getAmount()).doubleValue() >= 0) {
+					if (reentrantLock.tryLock()) {
+
 						if (withdraw(getAccount(transfer.getFromAccount()), transfer.getAmount())) {
 							if (deposit(getAccount(transfer.getToAccount()), transfer.getAmount())) {
 								success = true;
 							}
+						} else {
+							throw new InsufficientBalanceException();
 						}
-					} else {
-						throw new InsufficientBalanceException();
 					}
 				} finally {
 					reentrantLock.unlock();
 				}
 			}
-		}
-		if (success) {
 			this.notificationService.notifyAboutTransfer(getAccount(transfer.getFromAccount()),
 					transfer.getAmount() + " amount transferred successfully to " + transfer.getToAccount());
 			this.notificationService.notifyAboutTransfer(getAccount(transfer.getToAccount()),

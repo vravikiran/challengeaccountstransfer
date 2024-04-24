@@ -15,5 +15,5 @@ public interface AccountsRepository {
 
 	BigDecimal getBalance(String accountId);
 
-	Account updateBalance(String accountId, BigDecimal balance);
+	Account updateBalance(Account account);
 }

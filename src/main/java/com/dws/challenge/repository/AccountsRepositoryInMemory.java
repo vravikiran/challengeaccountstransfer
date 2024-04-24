@@ -38,11 +38,11 @@ public class AccountsRepositoryInMemory implements AccountsRepository {
 	}
 
 	@Override
-	public Account updateBalance(String accountId, BigDecimal balance) {
-		Account account = getAccount(accountId);
-		account.setBalance(balance);
-		accounts.put(accountId, account);
-		return getAccount(accountId);
+	public Account updateBalance(Account updatedAcc) {
+		Account account = getAccount(updatedAcc.getAccountId());
+		account.setBalance(updatedAcc.getBalance());
+		accounts.put(updatedAcc.getAccountId(), account);
+		return getAccount(updatedAcc.getAccountId());
 	}
 
 }
