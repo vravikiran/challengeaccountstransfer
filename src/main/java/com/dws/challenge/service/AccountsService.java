@@ -1,7 +1,6 @@
 package com.dws.challenge.service;
 
 import java.math.BigDecimal;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -23,8 +22,6 @@ public class AccountsService {
 	@Autowired
 	private final NotificationService notificationService;
 
-	private final ReentrantLock reentrantLock;
-
 	public AccountsRepository getAccountsRepository() {
 		return accountsRepository;
 	}
@@ -32,11 +29,6 @@ public class AccountsService {
 	public AccountsService(AccountsRepository accountsRepository, NotificationService notificationService) {
 		this.accountsRepository = accountsRepository;
 		this.notificationService = notificationService;
-		this.reentrantLock = new ReentrantLock(true);
-	}
-
-	public ReentrantLock getReentrantLock() {
-		return reentrantLock;
 	}
 
 	@Transactional
