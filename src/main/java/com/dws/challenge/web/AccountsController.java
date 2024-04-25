@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,14 +68,6 @@ public class AccountsController {
 		return new  ResponseEntity<>(transfer.getAmount() + " transfered successfully to " + transfer.getToAccount(), HttpStatus.OK);
 	}
 	
-	@PutMapping(path="/updateBalance", consumes= MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public ResponseEntity<Object> updateBalance(@RequestBody Account account) throws AccountDoesNotExistsException {
-		Account origAccount = getAccount(account.getAccountId());
-		accountsService.deposit(origAccount,account.getBalance());
-		return new ResponseEntity<>("Balance updated successfully",HttpStatus.OK);
-	}
-
 	@ExceptionHandler(AccountDoesNotExistsException.class)
 	public ResponseEntity<Object> handleAccountDoesNotExistsException() {
 		return new ResponseEntity<>("Account Does not exists", HttpStatus.FORBIDDEN);

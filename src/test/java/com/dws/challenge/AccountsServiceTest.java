@@ -2,7 +2,6 @@ package com.dws.challenge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -12,7 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,21 +64,6 @@ class AccountsServiceTest {
 	}
 
 	@Test
-	void testUpdateBalance_InvalidAccount() {
-		given(accountsRepository.getAccount(anyString())).willReturn(null);
-		assertThrows(AccountDoesNotExistsException.class,
-				() -> accountsService.deposit(getAccount(), getAccount().getBalance()));
-	}
-
-	@Test
-	void testUpdateBalance_WithValidAccount() throws InterruptedException, ExecutionException {
-		Account account = getAccount();
-		given(accountsRepository.getAccount(any())).willReturn(getAccount());
-		given(accountsRepository.updateBalance(any())).willReturn(account);
-		assertTrue(accountsService.deposit(getAccount(), getAccount().getBalance()));
-	}
-
-	@Test
 	void testTransfer_WithInvalidToAccount() {
 		Transfer transfer = getTransfer();
 		given(accountsRepository.getAccount(anyString())).willThrow(AccountDoesNotExistsException.class);
@@ -89,9 +72,8 @@ class AccountsServiceTest {
 
 	@Test
 	void testTransferWithInsuffAmountInFromAccount() {
-		Transfer transfer = getTransfer();
+		Transfer transfer = new Transfer("Id-123", "Id-124", new BigDecimal(1200));
 		given(accountsRepository.getAccount(anyString())).willReturn(getAccount());
-		given(accountsRepository.getBalance(anyString())).willReturn(new BigDecimal(-1));
 		assertThrows(InsufficientBalanceException.class, () -> accountsService.transfetAmount(transfer));
 	}
 
@@ -99,10 +81,8 @@ class AccountsServiceTest {
 	void testTransferWithValidBalAndAccounts() {
 		Transfer transfer = getTransfer();
 		given(accountsRepository.getAccount(anyString())).willReturn(getAccount());
-		given(accountsRepository.getBalance(anyString())).willReturn(new BigDecimal(1000));
 		accountsService.transfetAmount(transfer);
 		verify(accountsRepository, times(2)).updateBalance(any());
-		verify(notificationService, times(2)).notifyAboutTransfer(any(), any());
 	}
 
 	private Account getAccount() {

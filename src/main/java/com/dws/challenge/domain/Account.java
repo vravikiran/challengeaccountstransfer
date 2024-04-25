@@ -25,7 +25,11 @@ public class Account {
 	private BigDecimal balance;
 	
 	@JsonIgnore
-	public final ReentrantLock lock = new ReentrantLock(true);
+	private final ReentrantLock lock = new ReentrantLock(true);
+
+	public ReentrantLock getLock() {
+		return lock;
+	}
 
 	public Account(String accountId) {
 		this.accountId = accountId;
