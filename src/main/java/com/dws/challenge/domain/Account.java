@@ -23,7 +23,7 @@ public class Account {
 	@NotNull
 	@Min(value = 0, message = "Initial balance must be positive.")
 	private BigDecimal balance;
-	
+
 	@JsonIgnore
 	private final ReentrantLock lock = new ReentrantLock(true);
 
